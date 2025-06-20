@@ -8,6 +8,7 @@ import Car.project.exception.ResourceAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,13 +21,13 @@ public class ClientService {
     private ClientRepository clientRepository;
 
     // --- MÉTHODES PUBLIQUES APPELÉES PAR LE CONTROLLER ---
-
+    @Transactional(readOnly = true)
     public List<ClientDetailDTO> getAllClientsDto() {
         return clientRepository.findAll().stream()
                 .map(this::mapToClientDetailDTO)
                 .collect(Collectors.toList());
     }
-
+    @Transactional(readOnly = true)
     public ClientDetailDTO getClientDtoById(Long id) {
         Client client = findClientEntityById(id);
         return mapToClientDetailDTO(client);

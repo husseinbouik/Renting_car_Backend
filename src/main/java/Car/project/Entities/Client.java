@@ -80,21 +80,22 @@ public class Client {
     }
 
     @PostLoad
-    private void decryptData() {
-        try {
-            this.cname = this.cname != null ? EncryptionUtil.decrypt(this.cname) : null;
-            this.adresse = this.adresse != null ? EncryptionUtil.decrypt(this.adresse) : null;
-            this.adresseEtranger = this.adresseEtranger != null ? EncryptionUtil.decrypt(this.adresseEtranger) : null;
-            this.passeport = this.passeport != null ? EncryptionUtil.decrypt(this.passeport) : null;
-            this.cin = this.cin != null ? EncryptionUtil.decrypt(this.cin) : null;
-            this.tel = this.tel != null ? EncryptionUtil.decrypt(this.tel) : null;
-            this.permis = this.permis != null ? EncryptionUtil.decrypt(this.permis) : null;
-            this.photoCIN = this.photoCIN != null ? EncryptionUtil.decryptBytes(this.photoCIN) : null;
-            this.photoPermis = this.photoPermis != null ? EncryptionUtil.decryptBytes(this.photoPermis) : null;
-        } catch (Exception e) {
-            throw new RuntimeException("Erreur lors du déchiffrement des données", e);
-        }
-    }
+    	private void decryptData() {
+    	    try {
+    	        this.cname = this.cname != null ? EncryptionUtil.decrypt(this.cname) : null;
+    	        this.adresse = this.adresse != null ? EncryptionUtil.decrypt(this.adresse) : null;
+    	        this.adresseEtranger = this.adresseEtranger != null ? EncryptionUtil.decrypt(this.adresseEtranger) : null;
+    	        this.passeport = this.passeport != null ? EncryptionUtil.decrypt(this.passeport) : null;
+    	        this.cin = this.cin != null ? EncryptionUtil.decrypt(this.cin) : null;
+    	        this.tel = this.tel != null ? EncryptionUtil.decrypt(this.tel) : null;
+    	        this.permis = this.permis != null ? EncryptionUtil.decrypt(this.permis) : null;
+    	        this.photoCIN = this.photoCIN != null ? EncryptionUtil.decryptBytes(this.photoCIN) : null;
+    	        this.photoPermis = this.photoPermis != null ? EncryptionUtil.decryptBytes(this.photoPermis) : null;
+
+    	    } catch (Exception e) {
+    	        throw new RuntimeException("Erreur lors du déchiffrement des données", e);
+    	    }
+    	}
 
     public Client orElseThrow(Object object) {
         return null;
