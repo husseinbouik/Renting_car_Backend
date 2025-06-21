@@ -2,7 +2,7 @@ package Car.project.Controllers;
 
 import Car.project.dto.ReservationRequestDTO;
 import Car.project.dto.ReservationResponseDTO;
-import Car.project.Entities.Reservation;
+// Ne pas importer l'entité Reservation ici, car le contrôleur ne doit pas la manipuler directement.
 import Car.project.Services.ReservationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,42 +17,54 @@ import java.util.List;
 @RequestMapping("/api/reservations")
 public class ReservationController {
 
+    private final ReservationService reservationService;
+
+    
     @Autowired
-    private ReservationService reservationService;
+    public ReservationController(ReservationService reservationService) {
+        this.reservationService = reservationService;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ReservationResponseDTO>> getAllReservations() {
-        List<ReservationResponseDTO> reservations = reservationService.getAllReservationsDto();
+        List<ReservationResponseDTO> reservations = reservationService.getAllReservations();
         return ResponseEntity.ok(reservations);
     }
 
     @GetMapping("/{id}")
+    
     @PreAuthorize("@securiteService.isAdminOrOwner(#id)")
     public ResponseEntity<ReservationResponseDTO> getReservationById(@PathVariable Long id) {
-        ReservationResponseDTO reservationDto = reservationService.getReservationDtoById(id);
+        
+        ReservationResponseDTO reservationDto = reservationService.getReservationById(id);
         return ResponseEntity.ok(reservationDto);
     }
     
-    @PutMapping("/{id}")
-    public ReservationResponseDTO updateReservation(@PathVariable Long id, @Valid @RequestBody ReservationRequestDTO dto) {
-        return reservationService.updateReservation(id, dto);
-    }
+
+    @GetMapping("/user/{userId}")
     
-    @GetMapping("/client/{userId}")
-    public ResponseEntity<List<Reservation>> getReservationsByUserId(@PathVariable Long userId) {
-        List<Reservation> reservations = reservationService.getReservationsByUserId(userId);
-        if (reservations.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+    @PreAuthorize("@securiteService.isOwnerOfUserResource(#userId) or hasRole('ADMIN')")
+    public ResponseEntity<List<ReservationResponseDTO>> getReservationsByUserId(@PathVariable Long userId) {
+        
+    	 List<ReservationResponseDTO> reservations = reservationService.findReservationsByUserId(userId);
         return ResponseEntity.ok(reservations);
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()") 
     public ResponseEntity<ReservationResponseDTO> createReservation(@Valid @RequestBody ReservationRequestDTO reservationRequestDto) {
         ReservationResponseDTO createdReservation = reservationService.createReservation(reservationRequestDto);
         return new ResponseEntity<>(createdReservation, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("@securiteService.isAdminOrOwner(#id)")
+    public ResponseEntity<ReservationResponseDTO> updateReservation(
+            @PathVariable Long id,
+            @RequestBody @Valid ReservationRequestDTO dto) {
+        ReservationResponseDTO response = reservationService.updateReservation(id, dto);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
